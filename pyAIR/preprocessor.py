@@ -41,7 +41,7 @@ class BadImageDetector(object):
     """
 
     def __init__(self, fits_dataset):
-        self.dataset = fits_dataset
+        self.imageset = fits_dataset
 
     # PUBLIC ##################################################################
 
