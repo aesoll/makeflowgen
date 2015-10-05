@@ -14,7 +14,7 @@ import contextlib
 from datetime import datetime
 from glob import glob
 import multiprocessing
-from os.path import splitext, basename
+from os.path import splitext, basename, join
 import re
 from sys import path
 import numpy as np
@@ -105,18 +105,25 @@ class Preprocessor(object):
         datetime_numbers = tuple(int(x) for x in datetime_match.groups())
         return datetime(*datetime_numbers)
 
+    @staticmethod
+    def _to_sorted_numpy(df):
+        time_sorted_df = df.sort(['DATETIME'])
+        return np.array(time_sorted_df.to_records())
+
     def _get_headers(self, path_to_fits):
         """Get _get_headers for the fits files in this directory."""
-        filepath = path.join(path_to_fits, '*.fits')
+        filepath = join(path_to_fits, '*.fits')
 
         # get the _get_headers as dictionaries using all available cores
         # TODO compare with serial?
-        with contextlib.closing(multiprocessing.Pool()) as pool:
-            headers = pool.map(self._get_header, glob(filepath))
+        # with contextlib.closing(multiprocessing.Pool(processes=4)) as pool:
+        #     headers = pool.map(self._get_header, glob(filepath))
+        headers = map(Preprocessor._get_header, glob(filepath))
 
         return pd.DataFrame.from_dict(headers)
 
-    def _get_header(self, filename):
+    @staticmethod
+    def _get_header(filename):
         """Extract header metadata from a fits file. """
         base = splitext(basename(filename))[0]
         try:
@@ -126,11 +133,11 @@ class Preprocessor(object):
             vals = [row[1:] for row in h.cards]
             d = dict(zip(keys, vals))
 
-            dt = self._extract_datetime(d['DATE'][0])
+            dt = Preprocessor._extract_datetime(d['DATE'][0])
             image_type = d['VIMTYPE'][0][1:-1].strip()
             shutter_state = d['VSHUTTER'][0][1:-1].strip()
-            #TODO add other header entries of interest
 
+            # TODO add AO Loop state?
             processed_row = {
                 'IMAGE_NAME': base,
                 'DATETIME': dt,
@@ -143,9 +150,6 @@ class Preprocessor(object):
 
         return processed_row
 
-    def _to_sorted_numpy(self, df):
-        time_sorted_df = df.sort(['DATETIME'])
-        return np.array(time_sorted_df.to_records())
 
 class BadImageDetector(object):
     """

@@ -12,43 +12,53 @@ Unit tests for
     - correctness of generated makeflow files
 """
 from os import path
+import unittest
+from mock import Mock
+import numpy as np
+import pyAIR
 from pyAIR.preprocessor import Preprocessor
 
-__pkg_root__ = path.dirname(__file__)
-
-
-###############################################################################
-# TEST CLASSES
-###############################################################################
-
-class DummyPreprocessor(Preprocessor):
-
-    def __init__(self):
-        test_data_path = path.join(
-            __pkg_root__,
-            'pyAIR',
-            'datasets',
-            'tests',
-            'small_dataset'
-        )
-        # test_data = FitsDataset(test_data_path)
-        self.imageset = test_data
-
-    #TODO rm these once implemented in Preprocessor
-    def clean_imageset(self):
-        pass
-
-    def nearest_dark_pairings(self):
-        pass
+__pkg_root__ = path.dirname(pyAIR.__file__)
 
 ###############################################################################
 # TESTS
 ###############################################################################
 
+class PreprocessorTests(unittest.TestCase):
+    def setUp(self):
+        test_data_path = path.join(
+            __pkg_root__,
+            'datasets',
+            'tests',
+            'small_dataset'
+        )
+        preproc = Mock(Preprocessor)
+        preproc.full_set = Preprocessor._get_headers(preproc, test_data_path)
+        self.preproc = preproc
 
-def test_image_cleaning(self):
-    pass
+    def test_image_cleaning(self):
+        pass
+
+    def test_nearest_dark_pairs(self):
+        pass
+
+    def test_to_sorted_numpy(self):
+        full_set = self.preproc.full_set
+        result = Preprocessor._to_sorted_numpy(full_set)
+
+        # datetime is repr. as ns since the beginning of the epoch
+        expected = np.asarray(
+            [
+                (0, 1415079006000000000L, 'V47_20141104053006072910', 'DARK', 'SHUT'),
+                (1, 1415079947000000000L, 'V47_20141104054547220344', 'SCIENCE', 'OPEN'),
+            ],
+            dtype=[
+                ('index', '<i8'), ('DATETIME', '<M8[ns]'), ('IMAGE_NAME', 'O'),
+                ('IMAGE_TYPE', 'O'), ('SHUTTER_STATE', 'O')
+            ])
+        np.testing.assert_array_equal(result, expected)
 
 
-def test_nearest_dark_pairs(self):
-    pass
+class BadImageDetectorTests(unittest.TestCase):
+    def setUp(self):
+        pass
