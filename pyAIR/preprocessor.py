@@ -9,8 +9,17 @@
 """
 Preprocess image files in fits format to be input to fitssub.
 """
-
 from __future__ import division
+import contextlib
+from datetime import datetime
+from glob import glob
+import multiprocessing
+from os.path import splitext, basename
+import re
+from sys import path
+import numpy as np
+import pandas as pd
+import pfits
 
 
 class Preprocessor(object):
@@ -20,9 +29,13 @@ class Preprocessor(object):
     """
     # TODO documentation
 
-    def __init__(self, fits_SCIENCE_dataset, fits_DARK_dataset):
-        self.science_set = fits_SCIENCE_dataset
-        self.dark_set = fits_DARK_dataset
+    def __init__(self, path_to_fits_dir):
+        bd = BadImageDetector(self._get_headers(path_to_fits_dir))
+        full_set = bd.mask()
+
+        self.science_set = full_set[full_set['IMAGE_TYPE'] == 'SCIENCE']
+        self.dark_set = full_set[full_set['IMAGE_TYPE'] == 'DARK']
+        self.full_set = full_set
 
     # PUBLIC ##################################################################
 
@@ -51,21 +64,24 @@ class Preprocessor(object):
         Since the input was already sorted in ascending order, we don't have to look through earlier dark images because
         they are guaranteed to have a greater time difference.
         """
+        # sort on times, convert to numpy
+        science_set = self._to_sorted_numpy(self.science_set)
+        dark_set = self._to_sorted_numpy(self.dark_set)
 
         science_dark_matches = {}
         abs_difference = 99999999999999 # start with a high difference so that it can only get smaller
         dark_index_skip = 0 # this is jump the dark_index loop where we last left off
 
-        for science_index in range(length(self.science_set[:,0])-1):
-            science_entry = self.science_set[science_index+1,:]
+        for science_index in range(length(science_set[:,0])-1):
+            science_entry = science_set[science_index+1,:]
             science_time = science_entry[1]
-            for dark_index in range(length(self.dark_set[:,0])-1):
+            for dark_index in range(length(dark_set[:,0])-1):
                 dark_index += dark_index_skip
                 # This makes it so the loop starts where it left off from the last match
                 # (assuming files are in ascending order based on TIME)
                 previous_difference = abs_difference
 
-                dark_entry = self.dark_set[dark_index+1,:]
+                dark_entry = dark_set[dark_index+1,:]
                 dark_time = dark_entry[1]
 
                 abs_difference = abs(science_time - dark_time)
@@ -73,13 +89,63 @@ class Preprocessor(object):
                 if abs_difference > previous_difference:
                     # Here we check to see if differences are increasing, if they
                     # are then we just passed the minimum time difference
-                    science_dark_matches[science_entry[0]] = self.dark_set[dark_index[0]] # I have to grab the previous dark image
+                    science_dark_matches[science_entry[0]] = dark_set[dark_index[0]] # I have to grab the previous dark image
                     dark_index_skip = dark_index
                     break
 
         return science_dark_matches
         # raise NotImplementedError
 
+    # PRIVATE #################################################################
+
+    @staticmethod
+    def _extract_datetime(datetime_str):
+        p = re.compile(r"\'(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)\'")
+        datetime_match = p.match(datetime_str)
+        datetime_numbers = tuple(int(x) for x in datetime_match.groups())
+        return datetime(*datetime_numbers)
+
+    def _get_headers(self, path_to_fits):
+        """Get _get_headers for the fits files in this directory."""
+        filepath = path.join(path_to_fits, '*.fits')
+
+        # get the _get_headers as dictionaries using all available cores
+        # TODO compare with serial?
+        with contextlib.closing(multiprocessing.Pool()) as pool:
+            headers = pool.map(self._get_header, glob(filepath))
+
+        return pd.DataFrame.from_dict(headers)
+
+    def _get_header(self, filename):
+        """Extract header metadata from a fits file. """
+        base = splitext(basename(filename))[0]
+        try:
+            f = pfits.FITS(filename)
+            h = f.get_hdus()[0]
+            keys = [row[0] for row in h.cards]
+            vals = [row[1:] for row in h.cards]
+            d = dict(zip(keys, vals))
+
+            dt = self._extract_datetime(d['DATE'][0])
+            image_type = d['VIMTYPE'][0][1:-1].strip()
+            shutter_state = d['VSHUTTER'][0][1:-1].strip()
+            #TODO add other header entries of interest
+
+            processed_row = {
+                'IMAGE_NAME': base,
+                'DATETIME': dt,
+                'IMAGE_TYPE': image_type,
+                'SHUTTER_STATE': shutter_state
+            }
+        except IOError as (errnum, msg):
+            print "I/O Error({0}): {1}".format(errnum, msg)
+            exit(errnum)
+
+        return processed_row
+
+    def _to_sorted_numpy(self, df):
+        time_sorted_df = df.sort(['DATETIME'])
+        return np.array(time_sorted_df.to_records())
 
 class BadImageDetector(object):
     """

@@ -12,7 +12,6 @@ Unit tests for
     - correctness of generated makeflow files
 """
 from os import path
-from pyAIR.fits_dataset import FitsDataset
 from pyAIR.preprocessor import Preprocessor
 
 __pkg_root__ = path.dirname(__file__)
@@ -32,7 +31,7 @@ class DummyPreprocessor(Preprocessor):
             'tests',
             'small_dataset'
         )
-        test_data = FitsDataset(test_data_path)
+        # test_data = FitsDataset(test_data_path)
         self.imageset = test_data
 
     #TODO rm these once implemented in Preprocessor
