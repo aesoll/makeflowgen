@@ -48,7 +48,7 @@ class Preprocessor(object):
 
     def nearest_dark_pairings(self):
         """Pairs SCIENCE images with the DARK image closest in time of
-        obsevation.
+        observation.
 
         I'm assuming self.science_set & self.dark_set are numpy arrays with the following format:
         [Index, Time, FileName, Type, Shutter]

@@ -29,4 +29,4 @@ class Dummy_MakeflowGen(MakeflowGen):
 ###############################################################################
 
 def test_image_cleaning(self):
-    pass
+    print "FOO"  #MakeflowGen.pairs_dict
