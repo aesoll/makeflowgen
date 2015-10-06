@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
-# Image reduction for astronomy
+# Astronomical Image Reduction in Python
 #
 # Authors:
-#   TODO: ADD YOUR NAME HERE
+#   Philipp v. Bieberstein (pbieberstein@email.arizona.edu)
+#   Matt Madrid (matthewmadrid@email.arizona.edu)
 #   David Sidi (dsidi@email.arizona.edu)
 #   Adam Soll (adamsoll@email.arizona.edu)
+#   Gretchen Stahlman (gstahlman@email.arizona.edu)
 """
 Generates makeflow files for large-scale jobs subtracting DARK from SCIENCE
 images.

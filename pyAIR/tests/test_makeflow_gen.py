@@ -3,8 +3,11 @@
 # Image reduction for astronomy
 #
 # Authors:
-#   TODO: ADD YOUR NAME HERE
+#   Philipp v. Bieberstein (pbieberstein@email.arizona.edu)
+#   Matt Madrid (matthewmadrid@email.arizona.edu)
 #   David Sidi (dsidi@email.arizona.edu)
+#   Adam Soll (adamsoll@email.arizona.edu)
+#   Gretchen Stahlman (gstahlman@email.arizona.edu)
 """
 Unit tests for
     - cleaning the image dataset
