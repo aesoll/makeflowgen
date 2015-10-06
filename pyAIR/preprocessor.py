@@ -23,12 +23,11 @@ import pandas as pd
 
 
 class Preprocessor(object):
+    """Cleans image datasets in preparation for reduction.
+
+    Takes a path to a directory with a set of fits files, from which the
+    cleaned set will be created.
     """
-    It will receive two pandas data frames, One that contains all SCIENCE
-    images sorted by time and One that contains all DARK images sorted by time
-    (ascending)
-    """
-    # TODO documentation
 
     def __init__(self, path_to_fits_dir):
         # filter out bad images
@@ -68,7 +67,7 @@ class Preprocessor(object):
             return {}
 
         science_dark_matches = {}
-        dark_index_skip = 0 # this is jump the dark_index loop where we left off
+        dark_index_skip = 0  # this jumps to the dark_index where we left off
 
         # Iterate through all SCIENCE images
         for science_index in range(science_set.shape[0]):
@@ -107,6 +106,7 @@ class Preprocessor(object):
 
     @staticmethod
     def _extract_datetime(datetime_str):
+        """Get a datetime object from the date numbers in a FITS header."""
         p = re.compile(r"\'(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)\'")
         datetime_match = p.match(datetime_str)
         datetime_numbers = tuple(int(x) for x in datetime_match.groups())
@@ -114,20 +114,9 @@ class Preprocessor(object):
 
     @staticmethod
     def _to_sorted_numpy(df):
+        """Convert a pandas DataFrame to a sorted numpy array."""
         time_sorted_df = df.sort(['DATETIME'])
         return np.array(time_sorted_df.to_records())
-
-    def _get_headers(self, path_to_fits):
-        """Get _get_headers for the fits files in this directory."""
-        filepath = join(path_to_fits, '*.fits')
-
-        # get the _get_headers as dictionaries using all available cores
-        # TODO compare with serial?
-        # with contextlib.closing(multiprocessing.Pool(processes=4)) as pool:
-        #     headers = pool.map(self._get_header, glob(filepath))
-        headers = map(Preprocessor._get_header, glob(filepath))
-
-        return pd.DataFrame.from_dict(headers)
 
     @staticmethod
     def _get_header(filename):
@@ -159,7 +148,15 @@ class Preprocessor(object):
         return processed_row
 
     @staticmethod
+    def _get_headers(path_to_fits):
+        """Gets the headers for the fits files in this directory."""
+        filepath = join(path_to_fits, '*.fits')
+        headers = map(Preprocessor._get_header, glob(filepath))
+        return pd.DataFrame.from_dict(headers)
+
+    @staticmethod
     def _mask(df):
+        """Extracts legal rows from a table of image headers."""
         good_rows = df[
             ~((df['SHUTTER_STATE'] == 'OPEN') &
               (df['IMAGE_TYPE'] == 'DARK')) &
@@ -167,6 +164,5 @@ class Preprocessor(object):
               (df['IMAGE_TYPE'] == 'SCIENCE')) &
             ~((df['AO_LOOP_STATE'] == 'OPEN') &
               (df['IMAGE_TYPE'] == 'SCIENCE'))
-            ]
+        ]
         return good_rows
-
