@@ -37,10 +37,10 @@ class MakeflowGen(object):
             dark = str(self.pairs_dict[key])
             output = "output_" + str(count)
             makeflow_file.write(
-                output + ": " + self.path + " -i " + science + ".fits -r " + dark + ".fits -o " + output + "\n"
+                output + ": " + self.path + " " + science + ".fits " + dark + ".fits " + "\n"
             )
             makeflow_file.write(
-                "\t" + self.path + " -i " + science + ".fits -r " + dark + ".fits -o " + output + "\n"
+                "\t" + self.path + " -i " + science + ".fits -r " + dark + ".fits -o " + output + "\n\n"
             ) 
             count += 1
 
