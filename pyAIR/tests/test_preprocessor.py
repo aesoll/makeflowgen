@@ -43,7 +43,20 @@ class PreprocessorTests(unittest.TestCase):
         pass
 
     def test_nearest_dark_pairs(self):
-        pass
+        """Uses dataset with two dark images, and known relations to the
+        science images"""
+        pp = self.preproc
+        pp.science_set = pp.full_set[pp.full_set['IMAGE_TYPE'] == 'SCIENCE']
+        pp.dark_set = pp.full_set[pp.full_set['IMAGE_TYPE'] == 'DARK']
+
+        # ./V47_20141104053006072910.fits
+        # DATE-OBS= '2014-11-04T05:30:06.072910'
+
+        # ./V47_20141104053006639865.fits:SIMPLE  =                    T / file does confo
+        # DATE-OBS= '2014-11-04T05:30:06.639865' / Date of
+
+
+
 
     def test_to_sorted_numpy(self):
         full_set = self.preproc.full_set

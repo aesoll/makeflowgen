@@ -11,7 +11,6 @@
 """
 Preprocess image files in fits format to be input to fitssub.
 """
-from __future__ import division
 from datetime import datetime
 from glob import glob
 from os.path import splitext, basename, join
@@ -107,7 +106,7 @@ class Preprocessor(object):
     @staticmethod
     def _extract_datetime(datetime_str):
         """Get a datetime object from the date numbers in a FITS header."""
-        p = re.compile(r"\'(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)\'")
+        p = re.compile(r"\'(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d).*\'")
         datetime_match = p.match(datetime_str)
         datetime_numbers = tuple(int(x) for x in datetime_match.groups())
         return datetime(*datetime_numbers)
@@ -129,7 +128,7 @@ class Preprocessor(object):
             vals = [row[1:] for row in h.cards]
             d = dict(zip(keys, vals))
 
-            dt = Preprocessor._extract_datetime(d['DATE'][0])
+            dt = Preprocessor._extract_datetime(d['DATE-OBS'][0])
             image_type = d['VIMTYPE'][0][1:-1].strip()
             shutter_state = d['VSHUTTER'][0][1:-1].strip()
             ao_loop_state = d['AOLOOPST'][0][1:-1].strip()
