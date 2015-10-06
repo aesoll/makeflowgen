@@ -73,10 +73,10 @@ class Preprocessor(object):
             science_entry = science_set[science_index]
             science_time = science_entry[2]
             abs_difference = sys.maxint
-            science_dark_matches[science_entry[3]] = dark_set[0][3]
+            science_dark_matches[science_entry[3]] = dark_set[dark_index_skip][3]
 
             # loop over rest of the darks until diff increases
-            for dark_index in range(1, dark_set.shape[0]):
+            for dark_index in range(dark_set.shape[0]):
                 dark_index += dark_index_skip
                 # This makes it so the loop starts where it left off from the
                 # last match (This assums files are in ascending order based on
@@ -98,6 +98,9 @@ class Preprocessor(object):
                     science_dark_matches[science_entry[3]] = dark_set[dark_index-1][3]
                     dark_index_skip = dark_index-1
                     break
+                # edge case
+                if dark_index == dark_set.shape[0] - 1:
+                    science_dark_matches[science_entry[3]] = dark_set[dark_index][3]
 
         return science_dark_matches
 
