@@ -25,16 +25,16 @@ class MakeflowGen(object):
         self.path = "/path/to/fitssub"
 
     def write(self):
-    	"""Take the pairs data and construct a makeflow file"""
+        """Take the pairs data and construct a makeflow file"""
         makeflow_path = path.join(
             path.dirname(pyAIR.__file__),
             'makeflows',
             'example.makeflow'
         )
         makeflow_file = open(makeflow_path, "w")
-    	count = 0
+        count = 0
 
-    	for key in self.pairs_dict:
+        for key in self.pairs_dict:
             science = str(key)
             dark = str(self.pairs_dict[key])
             output = "output_" + str(count)
