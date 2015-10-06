@@ -52,8 +52,8 @@ class PreprocessorTests(unittest.TestCase):
         # ./V47_20141104053006072910.fits
         # DATE-OBS= '2014-11-04T05:30:06.072910'
 
-        # ./V47_20141104053006639865.fits:SIMPLE  =                    T / file does confo
-        # DATE-OBS= '2014-11-04T05:30:06.639865' / Date of
+        # ./V47_20141104053006639865.fits
+        # DATE-OBS= '2014-11-04T05:30:06.639865'
 
 
 

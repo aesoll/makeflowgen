@@ -106,7 +106,9 @@ class Preprocessor(object):
     @staticmethod
     def _extract_datetime(datetime_str):
         """Get a datetime object from the date numbers in a FITS header."""
-        p = re.compile(r"\'(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d).*\'")
+        p = re.compile(
+            r"\'(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)\.(\d\d\d\d\d\d)\'"
+        )
         datetime_match = p.match(datetime_str)
         datetime_numbers = tuple(int(x) for x in datetime_match.groups())
         return datetime(*datetime_numbers)
