@@ -5,10 +5,10 @@ from pyAIR.makeflow_gen import MakeflowGen
 from pyAIR.preprocessor import Preprocessor
 
 __pkg_root__ = path.dirname(pyAIR.__file__)
-test_data_path = path.join(__pkg_root__, 'datasets')
+test_data_path = path.join(__pkg_root__, 'datasets', 'tests', 'smallish_dataset')
 
 proc = Preprocessor(test_data_path)
 pairings = proc.nearest_dark_pairings()
-MakeflowGen.write(pairings)
+mf_gen = MakeflowGen(pairings).write()
 
 

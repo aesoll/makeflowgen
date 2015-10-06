@@ -6,12 +6,12 @@
 #   TODO: ADD YOUR NAME HERE
 #   David Sidi (dsidi@email.arizona.edu)
 #   Adam Soll (adamsoll@email.arizona.edu)
-
-
 """
 Generates makeflow files for large-scale jobs subtracting DARK from SCIENCE
 images.
 """
+from os import path
+import pyAIR
 
 
 class MakeflowGen(object):
@@ -24,7 +24,12 @@ class MakeflowGen(object):
 
     def write(self):
     	"""Take the pairs data and construct a makeflow file"""
-        makeflow_file = open("/home/user/example.makeflow", "w")
+        makeflow_path = path.join(
+            path.dirname(pyAIR.__file__),
+            'makeflows',
+            'example.makeflow'
+        )
+        makeflow_file = open(makeflow_path, "w")
     	count = 0
 
     	for key in self.pairs_dict:

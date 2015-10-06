@@ -11,21 +11,17 @@ Unit tests for
     - extracting DARK-SCIENCE pairs
     - correctness of generated makeflow files
 """
-from pyAIR.makeflow_gen import MakeflowGen
-
-
 from os import path
 import unittest
 import pyAIR
-from pyAir.makeflow_gen import MakeflowGen
+from pyAIR.makeflow_gen import MakeflowGen
 
 __pkg_root__ = path.dirname(pyAIR.__file__)
+
 
 ###############################################################################
 # TEST CLASSES
 ###############################################################################
-
-class Dummy_MakeflowGen(MakeflowGen):
 
 class MakeflowGenTest(unittest.TestCase):
     """

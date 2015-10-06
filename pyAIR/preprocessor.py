@@ -20,6 +20,7 @@ from sys import path
 import numpy as np
 import pandas as pd
 import pfits
+import sys
 
 
 class Preprocessor(object):
@@ -31,7 +32,8 @@ class Preprocessor(object):
 
     def __init__(self, path_to_fits_dir):
         bd = BadImageDetector(self._get_headers(path_to_fits_dir))
-        full_set = bd.mask()
+        # full_set = bd.mask()
+        full_set = self._get_headers(path_to_fits_dir)
 
         self.science_set = full_set[full_set['IMAGE_TYPE'] == 'SCIENCE']
         self.dark_set = full_set[full_set['IMAGE_TYPE'] == 'DARK']
@@ -67,15 +69,20 @@ class Preprocessor(object):
         science_set = self._to_sorted_numpy(self.science_set)
         dark_set = self._to_sorted_numpy(self.dark_set)
 
+        if science_set.size == 0 or dark_set.size == 0:
+            return {}
+
         science_dark_matches = {}
         dark_index_skip = 0 # this is jump the dark_index loop where we last left off
 
         for science_index in range(science_set.shape[0]): # Iterate through all SCIENCE images
-            abs_difference = 999999999999999999 # start with a high difference so that it can only get smaller
             science_entry = science_set[science_index]
             science_time = science_entry[1]
+            abs_difference = sys.maxint
+            science_dark_matches[science_entry[2]] = dark_set[0][2]
 
-            for dark_index in range(dark_set.shape[0]): # Iterate through all DARK images
+            # loop over rest of the darks until diff increases
+            for dark_index in range(1, dark_set.shape[0]): # Iterate through all DARK images
                 dark_index += dark_index_skip
                 # This makes it so the loop starts where it left off from the last match
                 # (This assums files are in ascending order based on TIME, therefore there is no reason to research previous DARK images)
