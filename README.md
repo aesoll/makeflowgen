@@ -18,7 +18,7 @@ If sudo is available,
     
 If sudo is not avialable, and pip is installed to .local in your home dir
 
-    sudo pip install -e /path/to/pyAIR --install-option="--prefix=/path/to/your/home/.local"
+    pip install -e /path/to/pyAIR --install-option="--prefix=/path/to/your/home/.local"
     
 Then
 
