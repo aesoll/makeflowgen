@@ -12,6 +12,15 @@ Program used to generate makeflow files for processing FITS files using fitssub
 Install all dependencies and clone the repository. 
 
 ## Usage
+If sudo is available,
+
     sudo pip install -e /path/to/pyAIR
+    
+If sudo is not avialable, and pip is installed to .local in your home dir
+
+    sudo pip install -e /path/to/pyAIR --install-option="--prefix=/path/to/your/home/.local"
+    
+Then
+
     cd /path/to/pyAIR/bin
     ./reduce_images
