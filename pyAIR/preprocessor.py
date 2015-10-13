@@ -98,10 +98,12 @@ class Preprocessor(object):
                     science_dark_matches[science_entry[3]] = dark_set[dark_index-1][3]
                     dark_index_skip = dark_index-1
                     break
-                # edge case
+                # edge case (once hit, all subsequent science images will
+                # fall through to this case)
                 if dark_index == dark_set.shape[0] - 1:
                     science_dark_matches[science_entry[3]] = dark_set[dark_index][3]
                     dark_index_skip = dark_index
+                    break
 
         return science_dark_matches
 
