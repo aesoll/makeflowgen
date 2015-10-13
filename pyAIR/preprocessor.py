@@ -101,6 +101,7 @@ class Preprocessor(object):
                 # edge case
                 if dark_index == dark_set.shape[0] - 1:
                     science_dark_matches[science_entry[3]] = dark_set[dark_index][3]
+                    dark_index_skip = dark_index
 
         return science_dark_matches
 
