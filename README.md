@@ -1,4 +1,4 @@
-# makeflow-gen
+# makeflowgen
 Program used to generate makeflow files for processing FITS files using fitssub
 
 ## Dependencies 
@@ -18,11 +18,11 @@ If sudo is available,
 
 If sudo is not available, and pip is installed to .local in your home dir
 
-    pip install -e /path/to/makeflow-gen --install-option="--prefix=/path/to/your/home/.local"
+    pip install -e /path/to/makeflowgen --install-option="--prefix=/path/to/your/home/.local"
 
 Then
 
-    cd /path/to/makeflow-gen/bin
+    cd /path/to/makeflowgen/bin
 
 Modify reduce_images test_data_path to point to the fits data directory (e.g.
 
